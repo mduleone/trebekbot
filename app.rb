@@ -250,7 +250,7 @@ def is_exactly_correct_answer?(correct, answer)
 end
 
 def question_words
-  /^(what|whats|where|wheres|who|whos|when|whens|why|whys|how|hows) /i
+  /^(what|whats|where|wheres|who|whos|when|whens|why|whys|how|hows|which) /i
 end
 
 # Marks question as answered by:
