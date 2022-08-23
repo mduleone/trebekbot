@@ -8,7 +8,6 @@ require "text"
 require "sanitize"
 require "pycall"
 
-# TODO: figure out how to install ftfy in the context of this project/deployment, see https://github.com/rspeer/python-ftfy
 ftfy = PyCall.import_module("ftfy")
 
 configure do
