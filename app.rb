@@ -91,7 +91,9 @@ end
 def respond_with_question(params)
   channel_id = params[:channel_id]
   question = ""
-  unless $redis.exists("shush:question:#{channel_id}")
+
+  # zero means it doesn't exist, and the question isn't shushed
+  if $redis.exists("shush:question:#{channel_id}").zero?
     response = get_question(params[:timestamp])
     key = "current_question:#{channel_id}"
     previous_question = $redis.get(key)
@@ -146,13 +148,13 @@ def process_answer(params)
   current_question = $redis.get(key)
   reply = ""
   if current_question.nil?
-    reply = trebek_me if !$redis.exists("shush:answer:#{channel_id}")
+    reply = trebek_me if $redis.exists("shush:answer:#{channel_id}").zero?
   else
     current_question = JSON.parse(current_question)
     current_answer = current_question["answer"]
     user_answer = params[:text]
     answered_key = "user_answer:#{channel_id}:#{current_question["id"]}:#{user_id}"
-    if $redis.exists(answered_key)
+    if !$redis.exists(answered_key).zero?
       reply = "You had your chance, #{get_slack_name(user_id)}. Let someone else answer."
     elsif params["timestamp"].to_f > current_question["expiration"]
       if is_correct_answer?(current_answer, user_answer)
