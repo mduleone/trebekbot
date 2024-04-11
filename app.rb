@@ -101,7 +101,7 @@ def respond_with_question(params)
       previous_question = JSON.parse(previous_question)["answer"]
       question = "The answer is `#{previous_question}`.\n"
     end
-    question += "The category is `#{response["category"]["title"]}` for #{currency_format(response["value"])}: `#{response["question"]}`"
+    question += "The category is `#{response["category"]}` for #{currency_format(response["value"])}: `#{response["question"]}`"
     puts "[LOG] ID: #{response["id"]} | Category: #{response["category"]["title"]} | Question: #{response["question"]} | Answer: #{response["answer"]} | Value: #{response["value"]}"
     $redis.pipelined do
       $redis.set(key, response.to_json)
@@ -121,7 +121,7 @@ def get_question(timestamp)
   file = File.read('./clues.json')
   clues = JSON.parse(file)['clues']
   clue = clues.sample
-  clue["value"] = clue["value"].nil? ? 200 : clue[1..].to_i
+  clue["value"] = clue["value"].nil? ? 200 : clue['value'].gsub('$','').to_i
   clue["answer"] = Sanitize.fragment(clue["answer"].gsub(/\s+(&nbsp;|&)\s+/i, " and "))
   clue["expiration"] = timestamp.to_f + ENV["SECONDS_TO_ANSWER"].to_f
   clue
