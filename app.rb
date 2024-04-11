@@ -118,15 +118,11 @@ end
 # Adds an "expiration" value, which is the timestamp of the Slack request + the seconds to answer config var
 #
 def get_question(timestamp)
-  uri = "http://jservice.io/api/random?count=1"
-  request = HTTParty.get(uri)
-  puts "[LOG] #{request.body}"
-  response = JSON.parse(request.body).first
-  if response["question"].nil? || response["question"].strip == ""
-    response = get_question(timestamp)
-  end
-  response["value"] = 200 if response["value"].nil?
-  response["answer"] = Sanitize.fragment(response["answer"].gsub(/\s+(&nbsp;|&)\s+/i, " and "))
+  file = File.read('./clues.json')
+  clues = JSON.parse(file)['clues']
+  clue = clues.sample
+  response["value"] = 200 if clue["value"].nil?
+  response["answer"] = Sanitize.fragment(clue["answer"].gsub(/\s+(&nbsp;|&)\s+/i, " and "))
   response["expiration"] = timestamp.to_f + ENV["SECONDS_TO_ANSWER"].to_f
   response
 end
