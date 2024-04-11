@@ -121,7 +121,7 @@ def get_question(timestamp)
   file = File.read('./clues.json')
   clues = JSON.parse(file)['clues']
   clue = clues.sample
-  clue["value"] = 200 if clue["value"].nil?
+  clue["value"] = clue["value"].nil? ? 200 : clue[1..].to_i
   clue["answer"] = Sanitize.fragment(clue["answer"].gsub(/\s+(&nbsp;|&)\s+/i, " and "))
   clue["expiration"] = timestamp.to_f + ENV["SECONDS_TO_ANSWER"].to_f
   clue
