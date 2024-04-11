@@ -121,10 +121,10 @@ def get_question(timestamp)
   file = File.read('./clues.json')
   clues = JSON.parse(file)['clues']
   clue = clues.sample
-  response["value"] = 200 if clue["value"].nil?
-  response["answer"] = Sanitize.fragment(clue["answer"].gsub(/\s+(&nbsp;|&)\s+/i, " and "))
-  response["expiration"] = timestamp.to_f + ENV["SECONDS_TO_ANSWER"].to_f
-  response
+  clue["value"] = 200 if clue["value"].nil?
+  clue["answer"] = Sanitize.fragment(clue["answer"].gsub(/\s+(&nbsp;|&)\s+/i, " and "))
+  clue["expiration"] = timestamp.to_f + ENV["SECONDS_TO_ANSWER"].to_f
+  clue
 end
 
 # Processes an answer submitted by a user in response to a Jeopardy round:
