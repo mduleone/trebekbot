@@ -111,7 +111,7 @@ def respond_with_question(params)
   question
 end
 
-# Gets a random answer from the jService API, and does some cleanup on it:
+# Gets a random answer from the JSON doc, and does some cleanup on it:
 # If the question is not present, requests another one
 # If the answer doesn't have a value, sets a default of $200
 # If there's HTML in the answer, sanitizes it (otherwise it won't match the user answer)
@@ -121,7 +121,7 @@ def get_question(timestamp)
   file = File.read('./clues.json')
   clues = JSON.parse(file)['clues']
   clue = clues.sample
-  clue["value"] = clue["value"].nil? ? 200 : clue['value'].gsub('$','').to_i
+  clue["value"] = clue["value"].nil? ? 200 : clue['value'].gsub(',','').gsub('$','').to_i
   clue["answer"] = Sanitize.fragment(clue["answer"].gsub(/\s+(&nbsp;|&)\s+/i, " and "))
   clue["expiration"] = timestamp.to_f + ENV["SECONDS_TO_ANSWER"].to_f
   clue
