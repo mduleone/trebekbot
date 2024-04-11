@@ -101,7 +101,7 @@ def respond_with_question(params)
       previous_question = JSON.parse(previous_question)["answer"]
       question = "The answer is `#{previous_question}`.\n"
     end
-    question += "The category is `#{response["category"]["title"]}` for #{currency_format(response["value"])}: `#{response["question"]}`"
+    question += "The category is `#{response["category"]}` for #{currency_format(response["value"])}: `#{response["question"]}`"
     puts "[LOG] ID: #{response["id"]} | Category: #{response["category"]["title"]} | Question: #{response["question"]} | Answer: #{response["answer"]} | Value: #{response["value"]}"
     $redis.pipelined do
       $redis.set(key, response.to_json)
@@ -111,24 +111,20 @@ def respond_with_question(params)
   question
 end
 
-# Gets a random answer from the jService API, and does some cleanup on it:
+# Gets a random answer from the JSON doc, and does some cleanup on it:
 # If the question is not present, requests another one
 # If the answer doesn't have a value, sets a default of $200
 # If there's HTML in the answer, sanitizes it (otherwise it won't match the user answer)
 # Adds an "expiration" value, which is the timestamp of the Slack request + the seconds to answer config var
 #
 def get_question(timestamp)
-  uri = "http://jservice.io/api/random?count=1"
-  request = HTTParty.get(uri)
-  puts "[LOG] #{request.body}"
-  response = JSON.parse(request.body).first
-  if response["question"].nil? || response["question"].strip == ""
-    response = get_question(timestamp)
-  end
-  response["value"] = 200 if response["value"].nil?
-  response["answer"] = Sanitize.fragment(response["answer"].gsub(/\s+(&nbsp;|&)\s+/i, " and "))
-  response["expiration"] = timestamp.to_f + ENV["SECONDS_TO_ANSWER"].to_f
-  response
+  file = File.read('./clues.json')
+  clues = JSON.parse(file)['clues']
+  clue = clues.sample
+  clue["value"] = clue["value"].nil? ? 200 : clue['value'].gsub(',','').gsub('$','').to_i
+  clue["answer"] = Sanitize.fragment(clue["answer"].gsub(/\s+(&nbsp;|&)\s+/i, " and "))
+  clue["expiration"] = timestamp.to_f + ENV["SECONDS_TO_ANSWER"].to_f
+  clue
 end
 
 # Processes an answer submitted by a user in response to a Jeopardy round:
