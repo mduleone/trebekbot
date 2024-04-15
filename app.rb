@@ -119,7 +119,7 @@ end
 # Adds an "expiration" value, which is the timestamp of the Slack request + the seconds to answer config var
 #
 def get_question(timestamp)
-  file = File.read('./clues2.json')
+  file = File.read('./clues.json')
   clues = JSON.parse(file)['clues']
   clue = clues.sample
   clue["value"] = clue["value"].nil? ? 200 : clue['value'].gsub(',','').gsub('$','').to_i
