@@ -23,7 +23,7 @@ configure do
   $redis = Redis.new(host: uri.host, port: uri.port, password: uri.password)
 
   # Load clues only once, to avoid running out of memory
-  file = File.read('./clues2.json')
+  file = File.read('./clues.json')
   $clues = JSON.parse(file)['clues']
 end
 
