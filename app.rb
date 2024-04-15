@@ -21,6 +21,10 @@ configure do
     uri = URI.parse(ENV["REDISCLOUD_URL"])
   end
   $redis = Redis.new(host: uri.host, port: uri.port, password: uri.password)
+
+  # Load clues only once, to avoid running out of memory
+  file = File.read('./clues.json')
+  $clues = JSON.parse(file)['clues']
 end
 
 # Handles the POST request made by the Slack Outgoing webhook
@@ -119,9 +123,7 @@ end
 # Adds an "expiration" value, which is the timestamp of the Slack request + the seconds to answer config var
 #
 def get_question(timestamp)
-  file = File.read('./clues.json')
-  clues = JSON.parse(file)['clues']
-  clue = clues.sample
+  clue = $clues.sample
   clue["value"] = clue["value"].nil? ? 200 : clue['value'].gsub(',','').gsub('$','').to_i
   clue["answer"] = Sanitize.fragment(clue["answer"].gsub(/\s+(&nbsp;|&)\s+/i, " and "))
   clue["expiration"] = timestamp.to_f + ENV["SECONDS_TO_ANSWER"].to_f
