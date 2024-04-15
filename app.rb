@@ -107,6 +107,8 @@ def respond_with_question(params)
     end
     question += "The category is `#{response["category"]}` for #{currency_format(response["value"])}: `#{response["question"]}`"
     question += '\n' + response["links"].map{ |l| "#{l}\n"} if response["links"].size > 0
+    question += '\n' + "(air date: #{response["air_date"]})"
+
     puts "[LOG] ID: #{response["id"]} | Category: #{response["category"]["title"]} | Question: #{response["question"]} | Answer: #{response["answer"]} | Value: #{response["value"]}"
     $redis.pipelined do
       $redis.set(key, response.to_json)
