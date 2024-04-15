@@ -110,5 +110,5 @@ const newClues = clues.map((clue) => {
 // console.log({ clues: clues[0], newClues: newClues[0] });
 
 console.log("writing file");
-fs.writeFileSync("./clues2.json", JSON.stringify({ clues: newClues }));
+fs.writeFileSync("./clues.json", JSON.stringify({ clues: newClues }));
 console.log("done writing file");
