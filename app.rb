@@ -102,6 +102,7 @@ def respond_with_question(params)
       question = "The answer is `#{previous_question}`.\n"
     end
     question += "The category is `#{response["category"]}` for #{currency_format(response["value"])}: `#{response["question"]}`"
+    question += '\n' + response["links"].map{ |l| "#{l}\n"} if response["links"].size > 0
     puts "[LOG] ID: #{response["id"]} | Category: #{response["category"]["title"]} | Question: #{response["question"]} | Answer: #{response["answer"]} | Value: #{response["value"]}"
     $redis.pipelined do
       $redis.set(key, response.to_json)
@@ -118,7 +119,7 @@ end
 # Adds an "expiration" value, which is the timestamp of the Slack request + the seconds to answer config var
 #
 def get_question(timestamp)
-  file = File.read('./clues.json')
+  file = File.read('./clues2.json')
   clues = JSON.parse(file)['clues']
   clue = clues.sample
   clue["value"] = clue["value"].nil? ? 200 : clue['value'].gsub(',','').gsub('$','').to_i
