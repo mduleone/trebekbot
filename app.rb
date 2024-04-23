@@ -48,7 +48,7 @@ post "/" do
       response = "Invalid token"
     elsif is_channel_blacklisted?(params[:channel_name])
       response = "Sorry, can't play in this channel."
-    elsif params[:text].match(/^jeopard(y|ize) (me|us|him|her|them#{ENV["PEOPLE_NAMES"]})/i)
+    elsif params[:text].match(/^jeopard(y|ize) (me|us|him|her|them#{team_name_nouns})/i)
       response = respond_with_question(params)
     elsif params[:text].match(/^reset my score$/i)
       response = respond_with_reset_score
@@ -69,6 +69,10 @@ post "/" do
   end
   status 200
   body json_response_for_slack(response)
+end
+
+def team_name_nouns
+  ENV["PEOPLE_NAMES"] || ""
 end
 
 # Puts together the json payload that needs to be sent back to Slack
